@@ -11,34 +11,40 @@ import (
 	"time"
 )
 
-var TransactionId uint32
 
-// wait seconds before send response
-const sleepSecs = 10
-const serverName = `WebSocket Go Server v.1.0`
-
-func main() {
-	http.Handle("/api", websocket.Handler(Echo))
-
-	addr := ":1234"
-	TransactionId = 0
-
-	log.Printf(`Server listening at: "%s"%s`, addr, "\n")
-
-	if err := http.ListenAndServe(addr, nil); err != nil {
-		log.Fatal("ListenAndServe:", err)
-	}
+type responseMsgType struct {
+	Id      uint32 `json:"transactionId"`
+	Data    interface{} `json:"data"`
+	Server  string `json:"server"`
+	Created string `json:"created"`
 }
 
 type requestMsgType struct {
 	Message string `json:"message"`
 }
 
+// wait seconds before send response
+const sleepSecs = 10
+const serverName = `WebSocket Go Server v.1.0`
+const serverAddr = `:1234`
+
+var TransactionId uint32 = 0
+
+func main() {
+	http.Handle("/api", websocket.Handler(Echo))
+
+	log.Printf(`Server listening at: "%s"%s`, serverAddr, "\n")
+
+	if err := http.ListenAndServe(serverAddr, nil); err != nil {
+		log.Fatal("ListenAndServe:", err)
+	}
+}
+
 func ParseRequestMsg(ws *websocket.Conn) (requestMsg requestMsgType, err error) {
 	var reply string
 
 	if err = websocket.Message.Receive(ws, &reply); err != nil {
-		return requestMsg, errors.New(fmt.Sprint("Can't receive:", err))
+		return requestMsg, errors.New(fmt.Sprint("Can't receive: ", err.Error()))
 	}
 
 	fmt.Println("Received back from client: " + reply)
@@ -52,18 +58,12 @@ func ParseRequestMsg(ws *websocket.Conn) (requestMsg requestMsgType, err error) 
 	return requestMsg, nil
 }
 
-type responseMsgType struct {
-	Id     uint32 `json:"transactionId"`
-	Data   interface{} `json:"data"`
-	Server string `json:"server"`
-	Created time.Time `json:"created"`
-}
-
 func GenerateResponseMsg(requestMsg *requestMsgType) (responseMsg responseMsgType, err error) {
 	atomic.AddUint32(&TransactionId, 1)
 	responseMsg.Id = TransactionId
 	responseMsg.Data = requestMsg
 	responseMsg.Server = serverName
+	responseMsg.Created = time.Now().Format(time.RFC3339)
 
 	msg, err := json.Marshal(responseMsg)
 	if err != nil {

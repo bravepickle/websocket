@@ -8,3 +8,7 @@ Test scripts for web sockets implementation in GOLANG
 ## TODO
 * support of WSS (over HTTPS) protocol
 * proper handling of various specifics of web browser clients handling web sockets
+* add tests
+* reconnect logic
+* connection status check
+* command line commands execution example
