@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Testing Websocket</title>
+    <style>
+        textarea {
+            width: 100%;
+            height: 200px;
+        }
+    </style>
+</head>
+<body onload="websocketStart()">
+<h1>Websocket Client Example</h1>
+<button onclick="send()">Send</button>
+<h2><label for="request">Request Message</label></h2>
+<p>
+    <textarea id="request">{"message": "hello server!"}</textarea>
+</p>
+<h2><label for="log">Log</label></h2>
+<p>
+    <textarea id="log"></textarea>
+</p>
+<script type="text/javascript">
+    var ws, reqEl, logEl;
+
+    function websocketStart() {
+        ws = new WebSocket("ws://localhost:1234/api");
+        reqEl = document.getElementById('request');
+        logEl = document.getElementById('log');
+
+        ws.onopen = function () {
+            send();
+        };
+
+        ws.onmessage = function (event) {
+            var m = JSON.parse(event.data);
+            console.debug("Received message", m.message);
+            logEl.value += '<= ' + event.data + "\n";
+        };
+
+        ws.onerror = function (event) {
+            console.debug(event);
+        }
+    }
+
+    function send() {
+        ws.send(reqEl.value);
+
+        logEl.value += '=> ' + reqEl.value + "\n";
+    }
+</script>
+</body>
+</html>
