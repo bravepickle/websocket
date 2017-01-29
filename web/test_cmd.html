@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title>Testing Websocket</title>
+    <title>Testing Websocket Command Line Emulator</title>
     <style>
         textarea {
             width: 100%;
@@ -10,13 +10,13 @@
     </style>
 </head>
 <body onload="websocketStart()">
-<h1>Websocket Client Example</h1>
+<h1>Websocket Command Line Emulator</h1>
 <button onclick="send()">Send</button>
-<h2><label for="request">Request Message</label></h2>
+<h2><label for="request">Command</label></h2>
 <p>
-    <textarea id="request">{"message": "hello server!"}</textarea>
+    <textarea id="request">pwd</textarea>
 </p>
-<h2><label for="log">Log</label></h2>
+<h2><label for="log">Terminal</label></h2>
 <p>
     <textarea id="log"></textarea>
 </p>
@@ -24,7 +24,7 @@
     var ws, reqEl, logEl;
 
     function websocketStart() {
-        ws = new WebSocket("ws://localhost:1234/api");
+        ws = new WebSocket("ws://localhost:1234/cmd");
         reqEl = document.getElementById('request');
         logEl = document.getElementById('log');
 
@@ -35,7 +35,14 @@
         ws.onmessage = function (event) {
             var m = JSON.parse(event.data);
             console.debug("Received message", m.message);
-            logEl.value += '<= ' + event.data + "\n";
+            logEl.value += '$ ' + m.request.command + "\n";
+            logEl.value += '[' + m.created + "]\n";
+            logEl.value += '> ' + m.output + "\n";
+
+            if (m.error != '') {
+                logEl.value += 'error > ' + m.error + "\n";
+                console.error(m.error)
+            }
         };
 
         ws.onerror = function (event) {
@@ -58,7 +65,7 @@
     }
 
     function send() {
-        ws.send(reqEl.value);
+        ws.send(JSON.stringify({"command": reqEl.value}));
 
         logEl.value += '=> ' + reqEl.value + "\n";
     }
