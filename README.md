@@ -11,3 +11,20 @@ Test scripts for web sockets implementation in GOLANG
 * support of WSS (over HTTPS) protocol
 * proper handling of various specifics of web browser clients handling web sockets
 * add tests
+
+
+## Example
+
+1. Run websockets server
+```sh
+go build
+./websocket
+```
+
+2. Run html tests
+```sh
+cd web/
+python -m SimpleHTTPServer
+```
+ 
+3. Open links to [send JSON](http://localhost:8000/test.html) or [send CLI commands](http://localhost:8000/test_cmd.html) via websocket clients
