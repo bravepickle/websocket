@@ -28,3 +28,10 @@ python -m SimpleHTTPServer
 ```
  
 3. Open links to [send JSON](http://localhost:8000/test.html) or [send CLI commands](http://localhost:8000/test_cmd.html) via websocket clients
+
+
+### Command Line Emulator
+![CMD Websockets Emulator](http://take.ms/3Y9vQ)
+
+### JSON Requester
+![JSON Websockets Requester](http://take.ms/c7R0v)
